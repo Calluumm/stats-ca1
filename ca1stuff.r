@@ -1,23 +1,26 @@
 setwd(~) #set my working dir
 #install.packages("ggplot2") #comment out if installed
 library(ggplot2) #use the library :D
-##
-##
-## Will put the trim code here
-
-##
-##
+## Trim original file down to a trimmed state
+untrimmed <- read.csv("global_bleaching_environmental_untrimmed.csv", stringsAsFactors = FALSE)
+vars <- c("Depth_m", "Percent_Bleaching", "Ocean_Name")
+trimmed <- untrimmed[, vars]
+trimmed <- trimmed[trimmed$Ocean_Name == "Indian", ]
+trimmed <- trimmed[!is.na(trimmed$Ocean_Name), ]
+write.csv(trimmed, "trim_set.csv", row.names = FALSE)
+## Read data and filter it a bit
 data <- read.csv("trim_set.csv", stringsAsFactors = FALSE) #set our trimmed dataset as the data variable
 data$Depth_m <- num(data$Depth_m) #set the depth as numeric
 data$Percent_Bleaching <- num(data$Percent_Bleaching) #set the percent bleaching as numeric
 data <- na.omit(data[, c("Depth_m","Percent_Bleaching")]) #omit na values in our 2 columns
-
+##Initial test and interpretations
 print(length(data$Percent_Bleaching)) #it's 1986, doesn't exceed the 5000 limit for shapiro
 print(shapiro.test(data$Percent_Bleaching)) #not normal, let's transform
 print(shapiro.test(data$Depth_m)) #While the W value is close to 1 the tiny p value created from our large sample is indicating it is not normal
 print(shapiro.test(log(data$Percent_Bleaching+1))) #not normal even when log (make sure to add 1 as you can't log 0)
 print(shapiro.test(sqrt(data$Percent_Bleaching))) #not normal even when sqrt
 
+##Graphing
 #histogram making for % bleaching
 orig <- data$Percent_Bleaching # original values
 logp <- log1p(orig) #log transform
@@ -92,4 +95,5 @@ p <- ggplot(data, aes(Depth_m, Percent_Bleaching)) + #plot a scatter between dep
   theme_minimal(base_size = 14) + #background theme
   coord_cartesian(ylim = c(0, 100)) #limits the y axis as % cant exceed 0 or 100 in this context, stops the LOESS line exceeding such
 ggsave("scatter.png", plot = p, width = 9, height = 6, dpi = 300) #saves the plot as a png
+
 
