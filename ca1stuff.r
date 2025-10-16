@@ -2,12 +2,12 @@ setwd(~) #set my working dir
 #install.packages("ggplot2") #comment out if installed
 library(ggplot2) #use the library :D
 ## Trim original file down to a trimmed state
-untrimmed <- read.csv("global_bleaching_environmental_untrimmed.csv", stringsAsFactors = FALSE)
-vars <- c("Depth_m", "Percent_Bleaching", "Ocean_Name")
-trimmed <- untrimmed[, vars]
-trimmed <- trimmed[trimmed$Ocean_Name == "Indian", ]
-trimmed <- trimmed[!is.na(trimmed$Ocean_Name), ]
-write.csv(trimmed, "trim_set.csv", row.names = FALSE)
+untrimmed <- read.csv("global_bleaching_environmental_untrimmed.csv", stringsAsFactors = FALSE) #copy in the untrimmed dataset
+vars <- c("Depth_m", "Percent_Bleaching", "Ocean_Name") #the 3 variables we need 
+trimmed <- untrimmed[, vars] #trim the dataset to only the 3 variables we care about
+trimmed <- trimmed[trimmed$Ocean_Name == "Indian", ] #filter to only indian ocean data
+trimmed <- trimmed[!is.na(trimmed$Ocean_Name), ] #removed na from ocean_name incase, we'll remove na from the other columns later
+write.csv(trimmed, "trim_set.csv", row.names = FALSE) #saves a trimmed version 
 ## Read data and filter it a bit
 data <- read.csv("trim_set.csv", stringsAsFactors = FALSE) #set our trimmed dataset as the data variable
 data$Depth_m <- num(data$Depth_m) #set the depth as numeric
@@ -95,5 +95,6 @@ p <- ggplot(data, aes(Depth_m, Percent_Bleaching)) + #plot a scatter between dep
   theme_minimal(base_size = 14) + #background theme
   coord_cartesian(ylim = c(0, 100)) #limits the y axis as % cant exceed 0 or 100 in this context, stops the LOESS line exceeding such
 ggsave("scatter.png", plot = p, width = 9, height = 6, dpi = 300) #saves the plot as a png
+
 
 
